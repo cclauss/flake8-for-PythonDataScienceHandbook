@@ -104,7 +104,7 @@ script:
   #- cd website
   #- python copy_notebooks.py
   - |
-    SCRIPT=(cat << EOF
+    SCRIPT=$(cat << EOF
     from IPython import get_ipython
     $(jupyter nbconvert notebooks/${NOTEBOOK} --stdout --to script)
     EOF
