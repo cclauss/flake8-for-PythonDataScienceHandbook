@@ -1,0 +1,119 @@
+group: travis_latest
+dist: xenial    # required for Python 3.7 (travis-ci/travis-ci#9069)
+sudo: required  # required for Python 3.7 (travis-ci/travis-ci#9069)
+language: python
+cache: pip
+python:
+  #- 2.7
+  #- 3.4
+  #- 3.5
+  #- 3.6
+  - 3.7
+matrix:
+  allow_failures:
+    - python: 2.7
+    - python: nightly
+    - python: pypy
+    - python: pypy3
+env:
+  - NOTEBOOK=00.00-Preface.ipynb
+  - NOTEBOOK=01.00-IPython-Beyond-Normal-Python.ipynb
+  - NOTEBOOK=01.01-Help-And-Documentation.ipynb
+  - NOTEBOOK=01.02-Shell-Keyboard-Shortcuts.ipynb
+  - NOTEBOOK=01.03-Magic-Commands.ipynb
+  - NOTEBOOK=01.04-Input-Output-History.ipynb
+  - NOTEBOOK=01.05-IPython-And-Shell-Commands.ipynb
+  - NOTEBOOK=01.06-Errors-and-Debugging.ipynb
+  - NOTEBOOK=01.07-Timing-and-Profiling.ipynb
+  - NOTEBOOK=01.08-More-IPython-Resources.ipynb
+  - NOTEBOOK=02.00-Introduction-to-NumPy.ipynb
+  - NOTEBOOK=02.01-Understanding-Data-Types.ipynb
+  - NOTEBOOK=02.02-The-Basics-Of-NumPy-Arrays.ipynb
+  - NOTEBOOK=02.03-Computation-on-arrays-ufuncs.ipynb
+  - NOTEBOOK=02.04-Computation-on-arrays-aggregates.ipynb
+  - NOTEBOOK=02.05-Computation-on-arrays-broadcasting.ipynb
+  - NOTEBOOK=02.06-Boolean-Arrays-and-Masks.ipynb
+  - NOTEBOOK=02.07-Fancy-Indexing.ipynb
+  - NOTEBOOK=02.08-Sorting.ipynb
+  - NOTEBOOK=02.09-Structured-Data-NumPy.ipynb
+  - NOTEBOOK=03.00-Introduction-to-Pandas.ipynb
+  - NOTEBOOK=03.01-Introducing-Pandas-Objects.ipynb
+  - NOTEBOOK=03.02-Data-Indexing-and-Selection.ipynb
+  - NOTEBOOK=03.03-Operations-in-Pandas.ipynb
+  - NOTEBOOK=03.04-Missing-Values.ipynb
+  - NOTEBOOK=03.05-Hierarchical-Indexing.ipynb
+  - NOTEBOOK=03.06-Concat-And-Append.ipynb
+  - NOTEBOOK=03.07-Merge-and-Join.ipynb
+  - NOTEBOOK=03.08-Aggregation-and-Grouping.ipynb
+  - NOTEBOOK=03.09-Pivot-Tables.ipynb
+  - NOTEBOOK=03.10-Working-With-Strings.ipynb
+  - NOTEBOOK=03.11-Working-with-Time-Series.ipynb
+  - NOTEBOOK=03.12-Performance-Eval-and-Query.ipynb
+  - NOTEBOOK=03.13-Further-Resources.ipynb
+  - NOTEBOOK=04.00-Introduction-To-Matplotlib.ipynb
+  - NOTEBOOK=04.01-Simple-Line-Plots.ipynb
+  - NOTEBOOK=04.02-Simple-Scatter-Plots.ipynb
+  - NOTEBOOK=04.03-Errorbars.ipynb
+  - NOTEBOOK=04.04-Density-and-Contour-Plots.ipynb
+  - NOTEBOOK=04.05-Histograms-and-Binnings.ipynb
+  - NOTEBOOK=04.06-Customizing-Legends.ipynb
+  - NOTEBOOK=04.07-Customizing-Colorbars.ipynb
+  - NOTEBOOK=04.08-Multiple-Subplots.ipynb
+  - NOTEBOOK=04.09-Text-and-Annotation.ipynb
+  - NOTEBOOK=04.10-Customizing-Ticks.ipynb
+  - NOTEBOOK=04.11-Settings-and-Stylesheets.ipynb
+  - NOTEBOOK=04.12-Three-Dimensional-Plotting.ipynb
+  - NOTEBOOK=04.13-Geographic-Data-With-Basemap.ipynb
+  - NOTEBOOK=04.14-Visualization-With-Seaborn.ipynb
+  - NOTEBOOK=04.15-Further-Resources.ipynb
+  - NOTEBOOK=05.00-Machine-Learning.ipynb
+  - NOTEBOOK=05.01-What-Is-Machine-Learning.ipynb
+  - NOTEBOOK=05.02-Introducing-Scikit-Learn.ipynb
+  - NOTEBOOK=05.03-Hyperparameters-and-Model-Validation.ipynb
+  - NOTEBOOK=05.04-Feature-Engineering.ipynb
+  - NOTEBOOK=05.05-Naive-Bayes.ipynb
+  - NOTEBOOK=05.06-Linear-Regression.ipynb
+  - NOTEBOOK=05.07-Support-Vector-Machines.ipynb
+  - NOTEBOOK=05.08-Random-Forests.ipynb
+  - NOTEBOOK=05.09-Principal-Component-Analysis.ipynb
+  - NOTEBOOK=05.10-Manifold-Learning.ipynb
+  - NOTEBOOK=05.11-K-Means.ipynb
+  - NOTEBOOK=05.12-Gaussian-Mixtures.ipynb
+  - NOTEBOOK=05.13-Kernel-Density-Estimation.ipynb
+  - NOTEBOOK=05.14-Image-Features.ipynb
+  - NOTEBOOK=05.15-Learning-More.ipynb
+  - NOTEBOOK=06.00-Figure-Code.ipynb
+  - NOTEBOOK=Index.ipynb
+  global:
+    - REPO=jakevdp/PythonDataScienceHandbook
+
+install:
+  #- pip install -r requirements.txt
+  - pip install flake8  # pytest  # add other testing frameworks later
+before_script:
+  - URL=https://github.com/${REPO}
+  - echo ; echo -n "flake8 testing of ${URL} on " ; python -V
+  - git clone --depth=50 ${URL} ~/${REPO}  # --branch=master
+  - cd ~/${REPO}
+script:
+  - echo stop the build if there are Python syntax errors or undefined names
+  - echo ; echo -n "flake8 testing of ${URL} on " ; python -V
+  - time flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics
+  - echo exit-zero treats all errors as warnings.  The GitHub editor is 127 chars wide
+  - time flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+  - echo ; echo -n "flake8 testing of ${NOTEBOOK} on " ; python -V
+  - |
+    (cat << EOF
+    from IPython import get_ipython
+    $(jupyter nbconvert ${NOTEBOOK} --stdout --to script)
+    EOF
+    ) | flake8 - --count --select=E901,E999,F821,F822,F823 --show-source --statistics
+  - |
+    (cat << EOF
+    from IPython import get_ipython
+    $(jupyter nbconvert ${NOTEBOOK} --stdout --to script)
+    EOF
+    ) | flake8 - --count --exit-zero --ignore=E402 --max-complexity=10 --max-line-length=88 --statistics
+notifications:
+  on_success: change
+  on_failure: change  # `always` will be the setting once code changes slow down
