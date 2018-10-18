@@ -16,30 +16,30 @@ matrix:
     - python: pypy
     - python: pypy3
 env:
-  - NOTEBOOK=00.00-Preface.ipynb
-  - NOTEBOOK=01.00-IPython-Beyond-Normal-Python.ipynb
-  - NOTEBOOK=01.01-Help-And-Documentation.ipynb
-  - NOTEBOOK=01.02-Shell-Keyboard-Shortcuts.ipynb
-  - NOTEBOOK=01.03-Magic-Commands.ipynb
-  - NOTEBOOK=01.04-Input-Output-History.ipynb
-  - NOTEBOOK=01.05-IPython-And-Shell-Commands.ipynb
-  - NOTEBOOK=01.06-Errors-and-Debugging.ipynb
-  - NOTEBOOK=01.07-Timing-and-Profiling.ipynb
-  - NOTEBOOK=01.08-More-IPython-Resources.ipynb
-  - NOTEBOOK=02.00-Introduction-to-NumPy.ipynb
-  - NOTEBOOK=02.01-Understanding-Data-Types.ipynb
-  - NOTEBOOK=02.02-The-Basics-Of-NumPy-Arrays.ipynb
-  - NOTEBOOK=02.03-Computation-on-arrays-ufuncs.ipynb
-  - NOTEBOOK=02.04-Computation-on-arrays-aggregates.ipynb
-  - NOTEBOOK=02.05-Computation-on-arrays-broadcasting.ipynb
-  - NOTEBOOK=02.06-Boolean-Arrays-and-Masks.ipynb
-  - NOTEBOOK=02.07-Fancy-Indexing.ipynb
-  - NOTEBOOK=02.08-Sorting.ipynb
-  - NOTEBOOK=02.09-Structured-Data-NumPy.ipynb
-  - NOTEBOOK=03.00-Introduction-to-Pandas.ipynb
-  - NOTEBOOK=03.01-Introducing-Pandas-Objects.ipynb
-  - NOTEBOOK=03.02-Data-Indexing-and-Selection.ipynb
-  - NOTEBOOK=03.03-Operations-in-Pandas.ipynb
+  #- NOTEBOOK=00.00-Preface.ipynb
+  #- NOTEBOOK=01.00-IPython-Beyond-Normal-Python.ipynb
+  #- NOTEBOOK=01.01-Help-And-Documentation.ipynb
+  #- NOTEBOOK=01.02-Shell-Keyboard-Shortcuts.ipynb
+  #- NOTEBOOK=01.03-Magic-Commands.ipynb
+  #- NOTEBOOK=01.04-Input-Output-History.ipynb
+  #- NOTEBOOK=01.05-IPython-And-Shell-Commands.ipynb
+  #- NOTEBOOK=01.06-Errors-and-Debugging.ipynb
+  #- NOTEBOOK=01.07-Timing-and-Profiling.ipynb
+  #- NOTEBOOK=01.08-More-IPython-Resources.ipynb
+  #- NOTEBOOK=02.00-Introduction-to-NumPy.ipynb
+  #- NOTEBOOK=02.01-Understanding-Data-Types.ipynb
+  #- NOTEBOOK=02.02-The-Basics-Of-NumPy-Arrays.ipynb
+  #- NOTEBOOK=02.03-Computation-on-arrays-ufuncs.ipynb
+  #- NOTEBOOK=02.04-Computation-on-arrays-aggregates.ipynb
+  #- NOTEBOOK=02.05-Computation-on-arrays-broadcasting.ipynb
+  #- NOTEBOOK=02.06-Boolean-Arrays-and-Masks.ipynb
+  #- NOTEBOOK=02.07-Fancy-Indexing.ipynb
+  #- NOTEBOOK=02.08-Sorting.ipynb
+  #- NOTEBOOK=02.09-Structured-Data-NumPy.ipynb
+  #- NOTEBOOK=03.00-Introduction-to-Pandas.ipynb
+  #- NOTEBOOK=03.01-Introducing-Pandas-Objects.ipynb
+  #- NOTEBOOK=03.02-Data-Indexing-and-Selection.ipynb
+  #- NOTEBOOK=03.03-Operations-in-Pandas.ipynb
   - NOTEBOOK=03.04-Missing-Values.ipynb
   - NOTEBOOK=03.05-Hierarchical-Indexing.ipynb
   - NOTEBOOK=03.06-Concat-And-Append.ipynb
@@ -104,17 +104,13 @@ script:
   #- cd website
   #- python copy_notebooks.py
   - |
-    (cat << EOF
+    SCRIPT=(cat << EOF
     from IPython import get_ipython
     $(jupyter nbconvert notebooks/${NOTEBOOK} --stdout --to script)
     EOF
-    ) | flake8 - --count --select=E901,E999,F821,F822,F823 --show-source --statistics
-  - |
-    (cat << EOF
-    from IPython import get_ipython
-    $(jupyter nbconvert notebooks/${NOTEBOOK} --stdout --to script)
-    EOF
-    ) | flake8 - --count --exit-zero --ignore=E402 --max-complexity=10 --max-line-length=88 --statistics
+    )
+  - echo ${SCRIPT} | flake8 - --count --select=E901,E999,F821,F822,F823 --show-source --statistics
+  - echo ${SCRIPT} | flake8 - --count --exit-zero --ignore=E402 --max-complexity=10 --max-line-length=88 --statistics
 notifications:
   on_success: change
   on_failure: change  # `always` will be the setting once code changes slow down
